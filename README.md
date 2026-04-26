@@ -17,7 +17,7 @@ When you add the action, Dropzone will prompt you to fill in:
 |-------|-------|
 | **Server** | Your GokApi URL (e.g. `share.example.com`) |
 | **Port** | Only if using a non-default port, otherwise leave blank |
-| **Username** | Leave blank (not used) |
+| **Username** | Enter `api` (placeholder; not used, but Dropzone requires a value before the "Test Connection" button will run) |
 | **Password** | Your GokApi API key (must have `UPLOAD` permission) |
 | **Remote Path** | Leave blank (not used) |
 | **Root URL** | Leave blank (not used) |
@@ -33,7 +33,7 @@ The action defaults to `https://`. If your instance uses plain HTTP, enter the f
 ## Usage
 
 - **Drag files** onto the action to upload them to GokApi. The share URL is copied to your clipboard on success.
-- **Hold Shift while dragging** to set per-upload options (expiry days, allowed downloads, password). Leave any field blank to keep the server default.
+- **Hold Shift while dragging** to bring up a single options dialog (expiry days, allowed downloads, optional password). Leave any field blank to keep the server default.
 - **Click** the action to open the GokApi admin UI in your browser.
 
 Upload progress is shown in real-time, weighted by file size when uploading multiple files.

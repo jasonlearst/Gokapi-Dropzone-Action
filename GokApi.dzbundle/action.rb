@@ -1,6 +1,6 @@
 # Dropzone Action Info
 # Name: GokApi
-# Description: Uploads files to a GokApi server and copies the share URL to the clipboard.\n\nServer - your GokApi URL (e.g. share.example.com)\nPort - only needed for non-default ports, otherwise leave blank\nUsername - leave blank (not used)\nPassword - your GokApi API key (must have UPLOAD permission)\nRemote Path and Root URL - leave blank (not used)\n\nHold Shift while dragging to set per-upload expiry, download limit, and password.
+# Description: Uploads files to a GokApi server and copies the share URL to the clipboard.\n\nServer - your GokApi URL (e.g. share.example.com)\nPort - only needed for non-default ports, otherwise leave blank\nUsername - enter "api" (placeholder; not used, but Dropzone requires a value before Test Connection will run)\nPassword - your GokApi API key (must have UPLOAD permission)\nRemote Path and Root URL - leave blank (not used)\n\nHold Shift while dragging to set per-upload expiry, download limit, and password.
 # Handles: Files
 # Creator: Jason Learst
 # URL: https://github.com/jasonlearst/upload-to-gokapi
@@ -8,7 +8,7 @@
 # KeyModifiers: Command, Option, Control, Shift
 # SkipConfig: No
 # RunsSandboxed: Yes
-# Version: 1.0
+# Version: 1.1
 # MinDropzoneVersion: 4.0
 # OptionsNIB: ExtendedLogin
 # UniqueID: 73914820
@@ -168,23 +168,35 @@ def shift_held?
 end
 
 def prompt_upload_options
+  pconfig = <<~PASHUA
+    *.title = GokApi Upload Options
+    intro.type = text
+    intro.text = Leave any field blank to use the server default. Set Expiry or Downloads to 0 for unlimited.
+    expiry.type = textfield
+    expiry.label = Expiry (days) — default 14
+    expiry.width = 320
+    downloads.type = textfield
+    downloads.label = Allowed downloads — default 1
+    downloads.width = 320
+    password.type = textfield
+    password.label = Password (optional)
+    password.width = 320
+    b.type = defaultbutton
+    b.label = Upload
+    cb.type = cancelbutton
+    cb.label = Cancel
+  PASHUA
+
+  result = $dz.pashua(pconfig)
+
+  if result['cb'] == '1'
+    $dz.fail("Upload cancelled")
+  end
+
   opts = {}
-
-  expiry = $dz.inputbox("Expiry (days)", "How many days until the file expires? Leave blank for server default (14). Enter 0 for unlimited.", "")
-  unless expiry.nil? || expiry.strip.empty?
-    opts[:expiryDays] = expiry.strip
-  end
-
-  downloads = $dz.inputbox("Allowed downloads", "How many downloads are allowed? Leave blank for server default (1). Enter 0 for unlimited.", "")
-  unless downloads.nil? || downloads.strip.empty?
-    opts[:allowedDownloads] = downloads.strip
-  end
-
-  password = $dz.inputbox("Password", "Optional password to protect the file. Leave blank for none.", "")
-  unless password.nil? || password.strip.empty?
-    opts[:password] = password.strip
-  end
-
+  opts[:expiryDays] = result['expiry'].strip if result['expiry'] && !result['expiry'].strip.empty?
+  opts[:allowedDownloads] = result['downloads'].strip if result['downloads'] && !result['downloads'].strip.empty?
+  opts[:password] = result['password'] if result['password'] && !result['password'].to_s.empty?
   opts
 end
 
